@@ -18,4 +18,10 @@ public class WeatherController {
         return weatherService.getWeatherDetails(city);
     }
 
+    @GetMapping("/forecast/{city}")
+    public String getWeeklyForecast(@PathVariable String city) {
+        return weatherService.getWeeklyForecast(city);
+    }
+
+
 }

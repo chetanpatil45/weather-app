@@ -18,4 +18,12 @@ public class WeatherService {
         String url = apiUrl + "?q=" + city + "&appid="+ apiKey + "&units=metric";
         return restTemplate.getForObject(url, String.class);
     }
+
+    public String getWeeklyForecast(String city){
+        String url = apiUrl +
+                "/forecast?q=" + city +
+                "&appid=" + apiKey +
+                "&units=metric";
+        return restTemplate.getForObject(url, String.class);
+    }
 }
