@@ -1,8 +1,8 @@
 # Weather application 
 
 ### Features
--- 
-- User can Signup & Login.
+
+- User can view weather forcast.
 - Secure Password Hashing using BCrypt (Spring security).
 - Session-based Authentication.
 - View, Edit and Delete User Profile.
