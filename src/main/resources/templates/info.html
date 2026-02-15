@@ -1,0 +1,138 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Weather Details</title>
+
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet">
+
+    <style>
+        body {
+            background: linear-gradient(to right, #667eea, #764ba2);
+            min-height: 100vh;
+            padding: 40px;
+        }
+
+        .main-card {
+            background: white;
+            border-radius: 20px;
+            padding: 30px;
+            box-shadow: 0 15px 30px rgba(0,0,0,0.2);
+        }
+
+        .forecast-box {
+            background: #f8f9fa;
+            padding: 15px;
+            border-radius: 15px;
+            text-align: center;
+            margin-bottom: 15px;
+        }
+    </style>
+</head>
+<body>
+
+<div class="container main-card">
+
+    <h2 class="text-center mb-4">Weather Details</h2>
+
+    <div class="row">
+
+        <!-- Current Full Info -->
+        <div class="col-md-4 text-center">
+            <h4 id="cityName"></h4>
+            <img id="weatherIcon" width="100">
+            <h1 id="temperature"></h1>
+            <p id="description"></p>
+
+            <p>🌡 Feels Like: <span id="feelsLike"></span>°C</p>
+            <p>💧 Humidity: <span id="humidity"></span>%</p>
+            <p>🌬 Wind: <span id="wind"></span> m/s</p>
+            <p>🔵 Pressure: <span id="pressure"></span> hPa</p>
+            <p>👀 Visibility: <span id="visibility"></span> m</p>
+            <p>🌅 Sunrise: <span id="sunrise"></span></p>
+            <p>🌇 Sunset: <span id="sunset"></span></p>
+        </div>
+
+        <!-- 5 Day Forecast -->
+        <div class="col-md-8">
+            <h4 class="mb-3">This Week's Forecast</h4>
+            <div class="row" id="forecastSection"></div>
+        </div>
+
+    </div>
+
+</div>
+
+<script>
+
+    const params = new URLSearchParams(window.location.search);
+    const city = params.get("city");
+
+    // CURRENT WEATHER
+    fetch("/weather/" + city)
+        .then(res => res.json())
+        .then(data => {
+
+            document.getElementById("cityName").innerText = data.name;
+            document.getElementById("temperature").innerText =
+                Math.round(data.main.temp) + "°C";
+
+            document.getElementById("description").innerText =
+                data.weather[0].description;
+
+            document.getElementById("feelsLike").innerText =
+                Math.round(data.main.feels_like);
+
+            document.getElementById("humidity").innerText =
+                data.main.humidity;
+
+            document.getElementById("wind").innerText =
+                data.wind.speed;
+
+            document.getElementById("pressure").innerText =
+                data.main.pressure;
+
+            document.getElementById("visibility").innerText =
+                data.visibility;
+
+            const sunriseTime = new Date(data.sys.sunrise * 1000);
+            const sunsetTime = new Date(data.sys.sunset * 1000);
+
+            document.getElementById("sunrise").innerText =
+                sunriseTime.toLocaleTimeString();
+
+            document.getElementById("sunset").innerText =
+                sunsetTime.toLocaleTimeString();
+
+            const iconCode = data.weather[0].icon;
+            document.getElementById("weatherIcon").src =
+                "https://openweathermap.org/img/wn/" + iconCode + "@2x.png";
+        });
+
+    // FORECAST
+    fetch("/forecast/" + city)
+        .then(res => res.json())
+        .then(data => {
+
+            const forecastDiv = document.getElementById("forecastSection");
+
+            for (let i = 0; i < data.list.length; i += 8) {
+
+                const item = data.list[i];
+
+                forecastDiv.innerHTML += `
+                    <div class="col-md-4">
+                        <div class="forecast-box">
+                            <p>${new Date(item.dt * 1000).toDateString()}</p>
+                            <h5>${Math.round(item.main.temp)}°C</h5>
+                            <p>${item.weather[0].description}</p>
+                        </div>
+                    </div>
+                `;
+            }
+        });
+
+</script>
+
+</body>
+</html>
