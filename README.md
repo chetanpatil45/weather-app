@@ -14,7 +14,6 @@ A modern Weather Forecast Web Application built using **Spring Boot** that allow
 * 👀 Visibility range
 * 🌅 Sunrise & Sunset timing
 * 📅 5-Day weather forecast
-* 🎨 Modern glass UI design
 
 ---
 
@@ -51,83 +50,35 @@ A modern Weather Forecast Web Application built using **Spring Boot** that allow
 
 ---
 
-## ⚙️ Installation & Setup
 
-### 1️⃣ Clone the Repository
-
-```bash
-git clone https://github.com/your-username/weather-application.git
-cd weather-application
-```
-
-### 2️⃣ Configure API Key
-
-Add your OpenWeather API key inside:
-
-```properties
-application.properties
-```
-
-```properties
-weather.api.key=YOUR_API_KEY
-```
-
-### 3️⃣ Build the Project
-
-```bash
-mvn clean install
-```
-
-### 4️⃣ Run the Application
-
-```bash
-mvn spring-boot:run
-```
-
-OR run from your IDE.
-
----
-
-## 🌐 Access the Application
-
-Open your browser:
-
-```
-http://localhost:8081
-```
-
----
 
 ## 📂 Project Structure
 
 ```
-src/
- ├── controller/
- ├── service/
- ├── templates/
- ├── static/
- └── application.properties
+├── src/main/java
+|    ├── controller
+|    |    ├── HomeController.java  //controller with @Controller for load view's
+|    |    └── WeatherController.java  // controller with @RestController for managing RESTful API's, Sending JSON responses.
+|    ├── service/
+|    |    └── WeatherService.java   // service class to send request and getting response from API endpoints using RestTemplate.
+|    └── WeatherAppApplication.java  //main class
+├── src/main/resources
+     ├── static/
+     |   └── img.png // screenshot
+     ├── templates/
+     |   ├── index.html
+     |   └── info.html
+     └── application.properties   //configuration file, all configurations mentioned here. like ApiKey, API endpoint etc.
 ```
 
 ---
 
 ## 📸 Screenshots
+<img width="1920" height="1080" alt="image" src="https://github.com/user-attachments/assets/67acd87e-8e75-4ae3-ba78-2b4d1a18baf7" />
 
-*(Add your UI screenshots here)*
-
----
-
-## 📈 Future Improvements
-
-* Add hourly forecast
-* Add location-based weather (GPS)
-* Dark/Light theme toggle
-* Add weather animations
-* Deploy to cloud (AWS / Render / Railway)
 
 ---
 
 ## 👨‍💻 Author
-
-**Chetan**
-Java & Spring Boot Developer
+**Chetan** </br>
+Java | Spring Boot Developer
