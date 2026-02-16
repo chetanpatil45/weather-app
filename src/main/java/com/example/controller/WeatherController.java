@@ -23,5 +23,4 @@ public class WeatherController {
         return weatherService.getWeeklyForecast(city);
     }
 
-
 }
