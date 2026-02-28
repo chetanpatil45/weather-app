@@ -2,119 +2,457 @@
 <html lang="en">
 <head>
   <meta charset="UTF-8">
-  <title>Weather App</title>
-
-  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Atmos - Weather</title>
+  <link href="https://fonts.googleapis.com/css2?family=Syne:wght@400;600;700;800&family=DM+Mono:wght@300;400;500&display=swap" rel="stylesheet">
 
   <style>
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+    :root {
+      --bg: #0a0e1a;
+      --surface: #111828;
+      --surface2: #1a2236;
+      --accent: #5ee7c4;
+      --accent2: #f0a500;
+      --text: #e8edf8;
+      --muted: #6a7a99;
+      --border: rgba(255,255,255,0.07);
+    }
+
     body {
-        background: linear-gradient(to right, #4facfe, #00f2fe);
-        min-height: 100vh;
-        display: flex;
-        justify-content: center;
-        align-items: center;
+      font-family: 'DM Mono', monospace;
+      background: var(--bg);
+      color: var(--text);
+      min-height: 100vh;
+      display: flex;
+      justify-content: center;
+      align-items: flex-start;
+      padding: 40px 0 60px;
+      overflow-y: auto;
     }
 
+    /* Animated background */
+    body::before {
+      content: '';
+      position: fixed;
+      inset: 0;
+      background:
+        radial-gradient(ellipse 80% 60% at 20% 10%, rgba(94,231,196,0.08) 0%, transparent 60%),
+        radial-gradient(ellipse 60% 50% at 80% 90%, rgba(240,165,0,0.06) 0%, transparent 60%);
+      pointer-events: none;
+      z-index: 0;
+    }
+
+    /* Grid pattern */
+    body::after {
+      content: '';
+      position: fixed;
+      inset: 0;
+      background-image:
+        linear-gradient(var(--border) 1px, transparent 1px),
+        linear-gradient(90deg, var(--border) 1px, transparent 1px);
+      background-size: 60px 60px;
+      pointer-events: none;
+      z-index: 0;
+      opacity: 0.5;
+    }
+
+    .container {
+      position: relative;
+      z-index: 1;
+      width: 100%;
+      max-width: 520px;
+      padding: 24px;
+    }
+
+    /* Header */
+    .brand {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      margin-bottom: 40px;
+    }
+
+    .brand-name {
+      font-family: 'Syne', sans-serif;
+      font-size: 28px;
+      font-weight: 800;
+      letter-spacing: -0.02em;
+      color: var(--text);
+    }
+
+    .brand-name span {
+      color: var(--accent);
+    }
+
+    .brand-tag {
+      font-size: 10px;
+      color: var(--muted);
+      letter-spacing: 0.15em;
+      text-transform: uppercase;
+      background: var(--surface);
+      border: 1px solid var(--border);
+      padding: 4px 10px;
+      border-radius: 20px;
+    }
+
+    /* Search */
+    .search-section {
+      margin-bottom: 28px;
+    }
+
+    .search-label {
+      font-size: 10px;
+      color: var(--muted);
+      letter-spacing: 0.15em;
+      text-transform: uppercase;
+      margin-bottom: 10px;
+      display: block;
+    }
+
+    .search-row {
+      display: flex;
+      gap: 10px;
+    }
+
+    .search-input {
+      flex: 1;
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: 12px;
+      padding: 14px 18px;
+      color: var(--text);
+      font-family: 'DM Mono', monospace;
+      font-size: 14px;
+      outline: none;
+      transition: border-color 0.2s, box-shadow 0.2s;
+    }
+
+    .search-input::placeholder { color: var(--muted); }
+
+    .search-input:focus {
+      border-color: var(--accent);
+      box-shadow: 0 0 0 3px rgba(94,231,196,0.1);
+    }
+
+    .search-btn {
+      background: var(--accent);
+      color: #0a0e1a;
+      border: none;
+      border-radius: 12px;
+      padding: 14px 20px;
+      font-family: 'Syne', sans-serif;
+      font-weight: 700;
+      font-size: 13px;
+      cursor: pointer;
+      transition: transform 0.15s, opacity 0.15s;
+      white-space: nowrap;
+    }
+
+    .search-btn:hover { opacity: 0.85; transform: translateY(-1px); }
+    .search-btn:active { transform: translateY(0); }
+
+    /* Unit toggle */
+    .unit-toggle {
+      display: inline-flex;
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: 10px;
+      overflow: hidden;
+      margin-bottom: 28px;
+    }
+
+    .unit-btn {
+      padding: 8px 20px;
+      font-family: 'DM Mono', monospace;
+      font-size: 13px;
+      font-weight: 500;
+      border: none;
+      background: transparent;
+      color: var(--muted);
+      cursor: pointer;
+      transition: all 0.2s;
+    }
+
+    .unit-btn.active {
+      background: var(--accent);
+      color: #0a0e1a;
+      font-weight: 700;
+    }
+
+    /* Weather Card */
     .weather-card {
-        background: white;
-        border-radius: 20px;
-        padding: 40px;
-        width: 400px;
-        box-shadow: 0 15px 30px rgba(0,0,0,0.2);
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: 24px;
+      padding: 32px;
+      display: none;
+      animation: slideUp 0.4s ease;
     }
 
-    .temperature {
-        font-size: 48px;
-        font-weight: bold;
+    @keyframes slideUp {
+      from { opacity: 0; transform: translateY(20px); }
+      to   { opacity: 1; transform: translateY(0); }
     }
 
-    .weather-icon {
-        width: 100px;
+    .card-top {
+      display: flex;
+      justify-content: space-between;
+      align-items: flex-start;
+      margin-bottom: 28px;
     }
+
+    .city-text {
+      font-family: 'Syne', sans-serif;
+      font-size: 22px;
+      font-weight: 700;
+    }
+
+    .temp-display {
+      font-family: 'Syne', sans-serif;
+      font-size: 64px;
+      font-weight: 800;
+      line-height: 1;
+      color: var(--accent);
+      letter-spacing: -3px;
+    }
+
+    .weather-icon-wrap {
+      text-align: right;
+    }
+
+    .weather-icon-wrap img {
+      width: 90px;
+      filter: drop-shadow(0 0 20px rgba(94,231,196,0.3));
+    }
+
+    .desc-text {
+      font-size: 13px;
+      color: var(--muted);
+      text-transform: capitalize;
+      margin-top: 4px;
+    }
+
+    /* Stats row */
+    .stats-row {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 12px;
+      margin-bottom: 24px;
+    }
+
+    .stat-item {
+      background: var(--surface2);
+      border: 1px solid var(--border);
+      border-radius: 14px;
+      padding: 16px;
+      display: flex;
+      align-items: center;
+      gap: 12px;
+    }
+
+    .stat-icon { font-size: 20px; }
+
+    .stat-label {
+      font-size: 10px;
+      color: var(--muted);
+      letter-spacing: 0.1em;
+      text-transform: uppercase;
+      margin-bottom: 2px;
+    }
+
+    .stat-value {
+      font-size: 14px;
+      font-weight: 500;
+      color: var(--text);
+    }
+
+    /* Divider */
+    .divider {
+      height: 1px;
+      background: var(--border);
+      margin-bottom: 20px;
+    }
+
+    /* Details button */
+    .details-btn {
+      width: 100%;
+      padding: 14px;
+      background: transparent;
+      border: 1px solid var(--accent);
+      border-radius: 12px;
+      color: var(--accent);
+      font-family: 'Syne', sans-serif;
+      font-weight: 700;
+      font-size: 14px;
+      cursor: pointer;
+      letter-spacing: 0.05em;
+      transition: all 0.2s;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 8px;
+    }
+
+    .details-btn:hover {
+      background: var(--accent);
+      color: #0a0e1a;
+    }
+
+    .details-btn svg { transition: transform 0.2s; }
+    .details-btn:hover svg { transform: translateX(4px); }
+
+    /* Error */
+    .error-msg {
+      font-size: 13px;
+      color: #ff6b6b;
+      margin-top: 12px;
+      min-height: 20px;
+    }
+
+    /* Loader */
+    .loader {
+      display: none;
+      width: 20px;
+      height: 20px;
+      border: 2px solid var(--border);
+      border-top-color: var(--accent);
+      border-radius: 50%;
+      animation: spin 0.6s linear infinite;
+      margin: 0 auto;
+    }
+
+    @keyframes spin { to { transform: rotate(360deg); } }
   </style>
 </head>
 <body>
 
-<div class="weather-card text-center">
+<div class="container">
 
-  <h2 class="mb-4">🌤 Weather App</h2>
-
-  <div class="input-group mb-3">
-    <input type="text" id="cityInput" class="form-control"
-           placeholder="Enter city name">
-    <button class="btn btn-primary" onclick="getWeather()">Search</button>
+  <div class="brand">
+    <div class="brand-name">at<span>mos</span></div>
+    <div class="brand-tag">Weather Station</div>
   </div>
 
-  <div id="weatherResult" style="display:none;">
-    <h4 id="cityName"></h4>
-    <img id="weatherIcon" class="weather-icon" src="">
-    <div class="temperature" id="temperature"></div>
-    <p id="description"></p>
-    <p>💧 Humidity: <span id="humidity"></span>%</p>
-    <p>🌬 Wind: <span id="wind"></span> m/s</p>
+  <div class="search-section">
+    <span class="search-label">Location</span>
+    <div class="search-row">
+      <input type="text" id="cityInput" class="search-input" placeholder="Enter city name..." onkeydown="if(event.key==='Enter') getWeather()">
+      <button class="search-btn" onclick="getWeather()">Search</button>
+    </div>
+  </div>
 
-    <!-- SHOW MORE BUTTON -->
-    <button class="btn btn-success mt-3" onclick="goToDetails()">
-      Show More →
+  <!-- Unit toggle -->
+  <div class="unit-toggle">
+    <button class="unit-btn active" id="btnC" onclick="setUnit('C')">°C</button>
+    <button class="unit-btn" id="btnF" onclick="setUnit('F')">°F</button>
+  </div>
+
+  <div class="loader" id="loader"></div>
+  <div class="error-msg" id="errorMessage"></div>
+
+  <div class="weather-card" id="weatherResult">
+
+    <div class="card-top">
+      <div>
+        <div class="city-text" id="cityName"></div>
+        <div class="temp-display" id="temperature"></div>
+        <div class="desc-text" id="description"></div>
+      </div>
+      <div class="weather-icon-wrap">
+        <img id="weatherIcon" src="" alt="">
+      </div>
+    </div>
+
+    <div class="stats-row">
+      <div class="stat-item">
+        <span class="stat-icon">💧</span>
+        <div>
+          <div class="stat-label">Humidity</div>
+          <div class="stat-value"><span id="humidity"></span>%</div>
+        </div>
+      </div>
+      <div class="stat-item">
+        <span class="stat-icon">🌬</span>
+        <div>
+          <div class="stat-label">Wind</div>
+          <div class="stat-value"><span id="wind"></span> m/s</div>
+        </div>
+      </div>
+    </div>
+
+    <div class="divider"></div>
+
+    <button class="details-btn" onclick="goToDetails()">
+      Full Forecast
+      <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M5 12h14M12 5l7 7-7 7"/></svg>
     </button>
-  </div>
 
-  <div id="errorMessage" class="text-danger mt-3"></div>
+  </div>
 
 </div>
 
 <script>
+  let unit = 'C';
+  let rawTemp = null;
+
+  function setUnit(u) {
+    unit = u;
+    document.getElementById('btnC').classList.toggle('active', u === 'C');
+    document.getElementById('btnF').classList.toggle('active', u === 'F');
+    if (rawTemp !== null) updateTempDisplay(rawTemp);
+  }
+
+  function celsiusToFahrenheit(c) {
+    return Math.round(c * 9 / 5 + 32);
+  }
+
+  function updateTempDisplay(tempC) {
+    const display = unit === 'C'
+      ? Math.round(tempC) + '°C'
+      : celsiusToFahrenheit(tempC) + '°F';
+    document.getElementById('temperature').innerText = display;
+  }
 
   function getWeather() {
+    const city = document.getElementById('cityInput').value.trim();
+    if (!city) { alert('Please enter a city name'); return; }
 
-      const city = document.getElementById("cityInput").value;
+    document.getElementById('errorMessage').innerText = '';
+    document.getElementById('weatherResult').style.display = 'none';
+    document.getElementById('loader').style.display = 'block';
 
-      if (!city) {
-          alert("Please enter city name");
-          return;
-      }
+    fetch('/weather/' + encodeURIComponent(city))
+      .then(res => {
+        if (!res.ok) throw new Error('City not found');
+        return res.json();
+      })
+      .then(data => {
+        document.getElementById('loader').style.display = 'none';
+        document.getElementById('weatherResult').style.display = 'block';
 
-      fetch("/weather/" + city)
-          .then(response => {
-              if (!response.ok) {
-                  throw new Error("City not found");
-              }
-              return response.json();
-          })
-          .then(data => {
+        rawTemp = data.main.temp;
+        document.getElementById('cityName').innerText = data.name;
+        updateTempDisplay(rawTemp);
+        document.getElementById('description').innerText = data.weather[0].description;
+        document.getElementById('humidity').innerText = data.main.humidity;
+        document.getElementById('wind').innerText = data.wind.speed;
 
-              document.getElementById("weatherResult").style.display = "block";
-
-              document.getElementById("cityName").innerText = data.name;
-              document.getElementById("temperature").innerText =
-                  Math.round(data.main.temp) + "°C";
-
-              document.getElementById("description").innerText =
-                  data.weather[0].description;
-
-              document.getElementById("humidity").innerText =
-                  data.main.humidity;
-
-              document.getElementById("wind").innerText =
-                  data.wind.speed;
-
-              const iconCode = data.weather[0].icon;
-              document.getElementById("weatherIcon").src =
-                  "https://openweathermap.org/img/wn/" + iconCode + "@2x.png";
-
-          })
-          .catch(error => {
-              document.getElementById("weatherResult").style.display = "none";
-              document.getElementById("errorMessage").innerText =
-                  "City not found.";
-          });
+        const icon = data.weather[0].icon;
+        document.getElementById('weatherIcon').src =
+          'https://openweathermap.org/img/wn/' + icon + '@2x.png';
+      })
+      .catch(() => {
+        document.getElementById('loader').style.display = 'none';
+        document.getElementById('errorMessage').innerText = '⚠ City not found. Please try again.';
+      });
   }
 
   function goToDetails() {
-      const city = document.getElementById("cityName").innerText;
-      window.location.href = "/info?city=" + city;
+    const city = document.getElementById('cityName').innerText;
+    window.location.href = '/info?city=' + encodeURIComponent(city) + '&unit=' + unit;
   }
-
 </script>
 
 </body>
