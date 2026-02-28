@@ -73,12 +73,6 @@ A modern Weather Forecast Web Application built using **Spring Boot** that allow
 
 ---
 
-## 📸 Screenshots
-<img width="1920" height="1080" alt="image" src="https://github.com/user-attachments/assets/67acd87e-8e75-4ae3-ba78-2b4d1a18baf7" />
-
-
----
-
 ## 👨‍💻 Author
 **Chetan** </br>
 Java | Spring Boot Developer
